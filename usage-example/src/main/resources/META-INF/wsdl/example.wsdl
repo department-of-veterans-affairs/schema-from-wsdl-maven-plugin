@@ -1,0 +1,52 @@
+<wsdl:definitions 
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ttdev.com/ss" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SimpleService" targetNamespace="http://ttdev.com/ss" xmlns:xi="http://www.w3.org/2001/XInclude">
+ <wsdl:types>
+ <xsd:schema targetNamespace="http://ttdev.com/ss">
+  <xsd:element name="concatRequest">
+   <xsd:complexType>
+    <xsd:sequence>
+     <xsd:element name="param1" type="xsd:string"/>
+     <xsd:element name="param2" type="xsd:string"/>
+    </xsd:sequence>
+   </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="concatResponse">
+   <xsd:complexType>
+    <xsd:sequence minOccurs="0" maxOccurs="100">
+     <xsd:element name="name" type="xsd:string"/>
+     <xsd:element name="description" type="xsd:string"/>
+    </xsd:sequence>
+   </xsd:complexType>
+  </xsd:element>
+  </xsd:schema>
+ </wsdl:types>
+ <wsdl:message name="concatRequest">
+  <wsdl:part name="parameters" element="tns:concatRequest"/>
+ </wsdl:message>
+ <wsdl:message name="concatResponse">
+  <wsdl:part name="parameters" element="tns:concatResponse"/>
+ </wsdl:message>
+ <wsdl:portType name="SimpleService">
+  <wsdl:operation name="concat">
+   <wsdl:input message="tns:concatRequest"/>
+   <wsdl:output message="tns:concatResponse"/>
+  </wsdl:operation>
+ </wsdl:portType>
+ <wsdl:binding name="SimpleServiceSOAP" type="tns:SimpleService">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="concat">
+   <soap:operation soapAction="http://ttdev.com/ss/NewOperation"/>
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+ </wsdl:binding>
+ <wsdl:service name="SimpleService">
+  <wsdl:port name="p1" binding="tns:SimpleServiceSOAP">
+   <soap:address location="http://localhost:8080/ss/p1"/>
+  </wsdl:port>
+ </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- The whole point of this plugin is to handle file locations provided by user input. -->
+  <Match>
+    <Class name="gov.va.plugin.maven.wsdl.SchemaFromWsdlMojo" />
+    <Bug pattern="PATH_TRAVERSAL_IN"/>
+  </Match>
+</FindBugsFilter>
