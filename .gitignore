@@ -1,3 +1,4 @@
 .idea
 target
 usage-example/target
+src/test/resources/xsd

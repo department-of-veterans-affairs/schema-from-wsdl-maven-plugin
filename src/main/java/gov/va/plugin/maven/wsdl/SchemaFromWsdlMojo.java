@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+import lombok.Builder;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -49,6 +50,9 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
    */
   @Parameter protected List<String> wsdlFiles;
 
+  /** Inject an implementation of a schema provider. */
+  @Inject private SimpleEmbeddedSchemaFromWsdlProvider versionProvider;
+
   /** Directory containing WSDL files. */
   @Parameter(defaultValue = "${project.basedir}/src/wsdl")
   private File wsdlDirectory;
@@ -57,8 +61,17 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
   @Parameter(defaultValue = "${project.basedir}/src/xsd")
   private File sourceDestDir;
 
-  /** Inject an implementation of a schema provider. */
-  @Inject private SimpleEmbeddedSchemaFromWsdlProvider versionProvider;
+  @Builder
+  private SchemaFromWsdlMojo(
+      List<String> wsdlFiles,
+      File wsdlDirectory,
+      File sourceDestDir,
+      SimpleEmbeddedSchemaFromWsdlProvider versionProvider) {
+    this.wsdlFiles = wsdlFiles;
+    this.wsdlDirectory = wsdlDirectory;
+    this.sourceDestDir = sourceDestDir;
+    this.versionProvider = versionProvider;
+  }
 
   /**
    * Execute the plugin.
@@ -165,7 +178,6 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
       }
       fileName += SCHEMA_FILE_EXTENSION;
       File output = new File(sourceDestDir, fileName);
-
       File parentDirectory = output.getParentFile();
       if (parentDirectory == null) {
         throw new MojoExecutionException(
