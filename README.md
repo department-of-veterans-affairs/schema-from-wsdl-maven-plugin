@@ -10,7 +10,7 @@ However, the configuration for this Mojo has been implemented to meet the bare r
 
 ## Usage
 
-Add build plugin to `pom.xml` as in the `usage-example`:
+Add build plugin to `pom.xml`:
 
 ```
 <build>
@@ -39,21 +39,10 @@ Add build plugin to `pom.xml` as in the `usage-example`:
 </build>
 ```
 
-## Example
-
-A usage example is shown in sub-project `usage-example`.
-
-Navigate to the example project and build.  Note the extracted schema found in the target directory.
-
-```
-cd usage-example
-mvn clean generate-sources
-```
-
 ## Known Issues/Concerns
 
 1. Utilities for parsing wsdl specifically to obtain an embedded schema. This implementation is simplistic although additional features can be added as required. 
 
    This implementation is simplistic and makes the following assumptions:
    * wsdl contains an embedded inline schema.
-   * wsdl only contains a single embedded inline schema..
+   * wsdl only contains a single embedded inline schema.
