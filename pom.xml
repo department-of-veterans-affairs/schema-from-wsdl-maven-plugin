@@ -21,9 +21,7 @@
     <maven>3.6.1</maven>
   </prerequisites>
   <properties>
-    <!-- vvvv begin TODO: Add unit tests and then remove this workaround -->
-    <jacoco.coverage>0.0</jacoco.coverage>
-    <!-- ^^^^ end -->
+    <jacoco.coverage>0.88</jacoco.coverage>
     <maven-core.version>3.6.0</maven-core.version>
     <maven-plugin-annotations.version>3.5</maven-plugin-annotations.version>
     <maven-plugin-api.version>3.6.0</maven-plugin-api.version>
