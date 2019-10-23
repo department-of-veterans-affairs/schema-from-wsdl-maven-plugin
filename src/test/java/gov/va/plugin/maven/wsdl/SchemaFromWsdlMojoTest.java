@@ -1,19 +1,33 @@
 package gov.va.plugin.maven.wsdl;
 
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import lombok.SneakyThrows;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.After;
 import org.junit.Test;
 
 public class SchemaFromWsdlMojoTest {
 
-  String wsdlDirectory = "src/test/resources/wsdl/valid";
+  String validWsdlDirectory = "src/test/resources/wsdl/valid/";
 
-  String sourceDestDir = "src/test/resources/xsd";
+  String invalidWsdlDirectory = "src/test/resources/wsdl/invalid/";
+
+  String sourceDestDir = "src/test/resources/xsd/";
 
   SimpleEmbeddedSchemaFromWsdlProvider versionProvider = new SimpleEmbeddedSchemaFromWsdlProvider();
+
+  @After
+  public void _cleanup() {
+    if (Paths.get(sourceDestDir + "valid.xsd").toFile().exists()) {
+      final boolean deleted = Paths.get(sourceDestDir + "valid.xsd").toFile().delete();
+      assertThat(deleted).isTrue();
+    }
+  }
 
   @Test(expected = MojoExecutionException.class)
   @SneakyThrows
@@ -28,7 +42,7 @@ public class SchemaFromWsdlMojoTest {
   public void extractInvalidWsdlFile() {
     SchemaFromWsdlMojo schemaFromWsdlMojo =
         SchemaFromWsdlMojo.builder()
-            .wsdlFiles(singletonList("src/test/resources/wsdl/invalid/multiple-schemas.wsdl"))
+            .wsdlFiles(singletonList(invalidWsdlDirectory + "multiple-schemas.wsdl"))
             .sourceDestDir(new File(sourceDestDir))
             .versionProvider(versionProvider)
             .build();
@@ -40,11 +54,14 @@ public class SchemaFromWsdlMojoTest {
   public void extractWsdlDirectory() {
     SchemaFromWsdlMojo schemaFromWsdlMojo =
         SchemaFromWsdlMojo.builder()
-            .wsdlDirectory(new File(wsdlDirectory))
+            .wsdlDirectory(new File(validWsdlDirectory))
             .sourceDestDir(new File(sourceDestDir))
             .versionProvider(versionProvider)
             .build();
     schemaFromWsdlMojo.execute();
+    String actual = new String(Files.readAllBytes(Paths.get(sourceDestDir + "valid.xsd")));
+    String expected = new String(Files.readAllBytes(Paths.get(sourceDestDir + "expected.xsd")));
+    assertThat(actual).isEqualToIgnoringWhitespace(expected);
   }
 
   @Test
@@ -52,11 +69,14 @@ public class SchemaFromWsdlMojoTest {
   public void extractWsdlFile() {
     SchemaFromWsdlMojo schemaFromWsdlMojo =
         SchemaFromWsdlMojo.builder()
-            .wsdlFiles(singletonList("src/test/resources/wsdl/valid/valid.wsdl"))
+            .wsdlFiles(singletonList(validWsdlDirectory + "valid.wsdl"))
             .sourceDestDir(new File(sourceDestDir))
             .versionProvider(versionProvider)
             .build();
     schemaFromWsdlMojo.execute();
+    String actual = new String(Files.readAllBytes(Paths.get(sourceDestDir + "valid.xsd")));
+    String expected = new String(Files.readAllBytes(Paths.get(sourceDestDir + "expected.xsd")));
+    assertThat(actual).isEqualToIgnoringWhitespace(expected);
   }
 
   @Test(expected = MojoExecutionException.class)
@@ -69,10 +89,10 @@ public class SchemaFromWsdlMojoTest {
 
   @Test(expected = MojoExecutionException.class)
   @SneakyThrows
-  public void test() {
+  public void nullSourceDestDir() {
     SchemaFromWsdlMojo schemaFromWsdlMojo =
         SchemaFromWsdlMojo.builder()
-            .wsdlFiles(singletonList(wsdlDirectory))
+            .wsdlFiles(singletonList(validWsdlDirectory))
             .sourceDestDir(null)
             .versionProvider(versionProvider)
             .build();
@@ -83,9 +103,7 @@ public class SchemaFromWsdlMojoTest {
   @SneakyThrows
   public void wsdlDoesNotExist() {
     SchemaFromWsdlMojo schemaFromWsdlMojo =
-        SchemaFromWsdlMojo.builder()
-            .wsdlFiles(singletonList("src/test/resources/xsd/test.wsdl"))
-            .build();
+        SchemaFromWsdlMojo.builder().wsdlFiles(singletonList("test.wsdl")).build();
     schemaFromWsdlMojo.execute();
   }
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -34,6 +35,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  * not support the whole suite of features for WSDL location although additional features can be
  * added as required.
  */
+@NoArgsConstructor
 @Mojo(name = "schema-from-wsdl", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class SchemaFromWsdlMojo extends AbstractMojo {
 
