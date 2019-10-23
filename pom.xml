@@ -28,6 +28,7 @@
     <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
     <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
     <maven-site-plugin.version>3.8.2</maven-site-plugin.version>
+    <slf4j-log4j12.version>1.7.28</slf4j-log4j12.version>
   </properties>
   <dependencies>
     <dependency>
@@ -55,6 +56,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j-log4j12.version}</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -69,15 +75,6 @@
   <build>
     <pluginManagement>
       <plugins>
-        <!-- vvvv begin TODO: remove this once in git. -->
-        <plugin>
-          <groupId>pl.project13.maven</groupId>
-          <artifactId>git-commit-id-plugin</artifactId>
-          <configuration>
-            <skip>true</skip>
-          </configuration>
-        </plugin>
-        <!-- ^^^^ end -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>

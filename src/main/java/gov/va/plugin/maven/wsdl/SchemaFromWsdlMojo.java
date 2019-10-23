@@ -16,6 +16,7 @@ import java.util.List;
 import javax.inject.Inject;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -37,6 +38,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  */
 @NoArgsConstructor
 @Mojo(name = "schema-from-wsdl", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Slf4j
 public class SchemaFromWsdlMojo extends AbstractMojo {
 
   /** Extension used for extracted schema files. */
@@ -187,7 +189,7 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
         throw new MojoExecutionException(
             "Unable to create parent for: " + output.getAbsolutePath());
       }
-      System.out.println("Writing schema: " + output.getAbsolutePath());
+      log.info("Writing schema: {}", output.getAbsolutePath());
       Files.write(output.toPath(), schema.getBytes(StandardCharsets.UTF_8));
     } catch (URISyntaxException | IOException | SecurityException e) {
       throw new MojoExecutionException(e.getMessage());
