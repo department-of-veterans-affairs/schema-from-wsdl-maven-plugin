@@ -2,6 +2,8 @@
 
 Maven Plugin to extract an inline embedded schema found in specified WSDL(s).
 
+By default, this plugin will run during the `generate-resources` phase.
+
 Schema files will have the same name as the associated WSDL but with extension `.xsd`
  
 The parameter configuration portion of this Mojo is heavily based on `jaxws-maven-plugin`.
@@ -21,7 +23,6 @@ Add build plugin to `pom.xml`:
             <version>${schema-from-wsdl-maven-plugin.version}</version>
             <executions>
                 <execution>
-                    <phase>generate-sources</phase>
                     <goals>
                         <goal>schema-from-wsdl</goal>
                     </goals>
