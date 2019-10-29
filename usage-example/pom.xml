@@ -10,7 +10,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <schema-from-wsdl-maven-plugin.version>1.0.1-SNAPSHOT</schema-from-wsdl-maven-plugin.version>
+    <schema-from-wsdl-maven-plugin.version>1.0.2-SNAPSHOT</schema-from-wsdl-maven-plugin.version>
   </properties>
 
   <build>
