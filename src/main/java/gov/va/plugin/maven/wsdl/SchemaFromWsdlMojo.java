@@ -14,9 +14,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -34,7 +36,9 @@ import org.apache.maven.plugins.annotations.Parameter;
  * not support the whole suite of features for WSDL location although additional features can be
  * added as required.
  */
+@NoArgsConstructor
 @Mojo(name = "schema-from-wsdl", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Slf4j
 public class SchemaFromWsdlMojo extends AbstractMojo {
 
   /** Extension used for extracted schema files. */
@@ -49,6 +53,9 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
    */
   @Parameter protected List<String> wsdlFiles;
 
+  /** Inject an implementation of a schema provider. */
+  @Inject private SimpleEmbeddedSchemaFromWsdlProvider versionProvider;
+
   /** Directory containing WSDL files. */
   @Parameter(defaultValue = "${project.basedir}/src/wsdl")
   private File wsdlDirectory;
@@ -57,17 +64,25 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
   @Parameter(defaultValue = "${project.basedir}/src/xsd")
   private File sourceDestDir;
 
-  /** Inject an implementation of a schema provider. */
-  @Inject private SimpleEmbeddedSchemaFromWsdlProvider versionProvider;
+  @Builder
+  private SchemaFromWsdlMojo(
+      List<String> wsdlFiles,
+      File wsdlDirectory,
+      File sourceDestDir,
+      SimpleEmbeddedSchemaFromWsdlProvider versionProvider) {
+    this.wsdlFiles = wsdlFiles;
+    this.wsdlDirectory = wsdlDirectory;
+    this.sourceDestDir = sourceDestDir;
+    this.versionProvider = versionProvider;
+  }
 
   /**
    * Execute the plugin.
    *
    * @throws MojoExecutionException Exception if unexpected condition occurs.
-   * @throws MojoFailureException Exception if unexpected failure occurs.
    */
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public void execute() throws MojoExecutionException {
     final List<URL> urlList = getWsdlUrlList();
     for (URL url : urlList) {
       String schema = versionProvider.getSchema(url);
@@ -165,7 +180,6 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
       }
       fileName += SCHEMA_FILE_EXTENSION;
       File output = new File(sourceDestDir, fileName);
-
       File parentDirectory = output.getParentFile();
       if (parentDirectory == null) {
         throw new MojoExecutionException(
@@ -175,7 +189,7 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
         throw new MojoExecutionException(
             "Unable to create parent for: " + output.getAbsolutePath());
       }
-      System.out.println("Writing schema: " + output.getAbsolutePath());
+      log.info("Writing schema: {}", output.getAbsolutePath());
       Files.write(output.toPath(), schema.getBytes(StandardCharsets.UTF_8));
     } catch (URISyntaxException | IOException | SecurityException e) {
       throw new MojoExecutionException(e.getMessage());

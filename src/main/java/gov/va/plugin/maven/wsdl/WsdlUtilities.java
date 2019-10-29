@@ -84,7 +84,7 @@ public final class WsdlUtilities {
       throws WsdlParseFailedException {
     final NodeList schemas =
         wsdlDoc.getElementsByTagNameNS(XMLConstants.W3C_XML_SCHEMA_NS_URI, ELEMENT_TAG_SCHEMA);
-    // NOTE: this simplisitic implementation assumes only one schema in the wsdl.
+    // NOTE: this simplistic implementation assumes only one schema in the wsdl.
     if (schemas.getLength() != 1) {
       throw new WsdlParseFailedException("Expected a single schema within the given wsdl.");
     }

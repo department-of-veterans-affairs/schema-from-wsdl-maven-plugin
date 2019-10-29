@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>gov.va.plugin.maven</groupId>
-    <artifactId>example-usage-schema-from-wsdl</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+  <groupId>gov.va.plugin.maven</groupId>
+  <artifactId>example-usage-schema-from-wsdl</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-    <properties>
+  <properties>
     <schema-from-wsdl-maven-plugin.version>1.0.0-SNAPSHOT</schema-from-wsdl-maven-plugin.version>
-    </properties>
+  </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>gov.va.plugin.maven</groupId>
-                <artifactId>schema-from-wsdl-maven-plugin</artifactId>
-                <version>${schema-from-wsdl-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>schema-from-wsdl</goal>
-                        </goals>
-                        <configuration>
-                            <wsdlDirectory>src/main/resources/META-INF/wsdl/</wsdlDirectory>
-                            <wsdlFiles>
-                                <wsdlFile>example.wsdl</wsdlFile>
-                            </wsdlFiles>
-                            <sourceDestDir>${basedir}/target/classes/META-INF/wsdl</sourceDestDir>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>gov.va.plugin.maven</groupId>
+        <artifactId>schema-from-wsdl-maven-plugin</artifactId>
+        <version>${schema-from-wsdl-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>schema-from-wsdl</goal>
+            </goals>
+            <configuration>
+              <wsdlDirectory>src/main/resources/META-INF/wsdl/</wsdlDirectory>
+              <wsdlFiles>
+                <wsdlFile>example.wsdl</wsdlFile>
+              </wsdlFiles>
+              <sourceDestDir>${basedir}/target/classes/META-INF/wsdl</sourceDestDir>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

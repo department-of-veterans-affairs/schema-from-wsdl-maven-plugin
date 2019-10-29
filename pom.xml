@@ -21,9 +21,7 @@
     <maven>3.6.1</maven>
   </prerequisites>
   <properties>
-    <!-- vvvv begin TODO: Add unit tests and then remove this workaround -->
-    <jacoco.coverage>0.0</jacoco.coverage>
-    <!-- ^^^^ end -->
+    <jacoco.coverage>0.88</jacoco.coverage>
     <maven-core.version>3.6.0</maven-core.version>
     <maven-plugin-annotations.version>3.5</maven-plugin-annotations.version>
     <maven-plugin-api.version>3.6.0</maven-plugin-api.version>
@@ -51,23 +49,28 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <pluginManagement>
       <plugins>
-        <!-- vvvv begin TODO: remove this once in git. -->
-        <plugin>
-          <groupId>pl.project13.maven</groupId>
-          <artifactId>git-commit-id-plugin</artifactId>
-          <configuration>
-            <skip>true</skip>
-          </configuration>
-        </plugin>
-        <!-- ^^^^ end -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
