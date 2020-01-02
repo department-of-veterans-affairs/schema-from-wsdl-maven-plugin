@@ -12,9 +12,12 @@ However, the configuration for this Mojo has been implemented to meet the bare r
 
 ## Usage
 
+WSDL(s) can be parsed from a specified directory (using the configuration element `wsdlDirectory` containing the directory path) *or* from a project dependency (using the configuration element `wsdlDependency` containing the referenced *groupId* and *artifactId* separated by a colon).
+
 Add build plugin to `pom.xml`:
 
 ```
+<!-- Example using wsdlDirectory. -->
 <build>
     <plugins>
         <plugin>
@@ -39,6 +42,39 @@ Add build plugin to `pom.xml`:
     </plugins>
 </build>
 ```
+
+If it is desired to reference a project dependency, replace the `wsdlDirectory` with a reference to a `wsdlDependency` and update the `wsdlFile` as appropriate.  For example:
+```
+    <!-- Example snippet showing wsdlDependency. -->
+    <wsdlDependency>gov.va.api.health:ee-artifacts</wsdlDependency>
+    <wsdlFiles>
+        <wsdlFile>META-INF/wsdl/eeSummary.wsdl</wsdlFile>
+    </wsdlFiles>
+```
+
+## Examples
+
+1. Parsing a WSDL from directory.
+
+   A usage example is shown in sub-project `usage-example`.
+
+   Navigate to the example project and build.  Note the extracted schema found in the target directory.
+
+   ```
+   cd usage-example
+   mvn clean generate-resources
+   ```
+   
+2. Parsing a WSDL as a resource from a project dependency.
+
+   A usage example is shown in sub-project `usage-example-dependency`.
+   
+   Navigate to the example project and build.  Note the extracted schema found in the target directory.
+   
+      ```
+      cd usage-example-dependency
+      mvn clean generate-resources
+      ```
 
 ## Known Issues/Concerns
 
