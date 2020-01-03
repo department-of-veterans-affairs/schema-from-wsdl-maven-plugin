@@ -5,23 +5,25 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Maven Mojo that writes an embedded schema found in a WSDL to a file.
@@ -37,7 +39,11 @@ import org.apache.maven.plugins.annotations.Parameter;
  * added as required.
  */
 @NoArgsConstructor
-@Mojo(name = "schema-from-wsdl", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Mojo(
+  name = "schema-from-wsdl",
+  defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
+  requiresDependencyResolution = ResolutionScope.RUNTIME
+)
 @Slf4j
 public class SchemaFromWsdlMojo extends AbstractMojo {
 
@@ -47,34 +53,32 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
   /** A class used to look up .wsdl documents from a given directory. */
   private static final FileFilter WSDL_FILE_FILTER = f -> f.getName().endsWith(".wsdl");
 
+  /** The Maven Project Object. */
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  @Setter
+  private MavenProject project;
+
   /**
    * List of files to use for WSDLs. If not specified, all <code>.wsdl</code> files in the <code>
    * wsdlDirectory</code> will be used.
    */
-  @Parameter protected List<String> wsdlFiles;
+  @Parameter @Setter private List<String> wsdlFiles;
 
   /** Inject an implementation of a schema provider. */
-  @Inject private SimpleEmbeddedSchemaFromWsdlProvider versionProvider;
+  @Inject @Setter private SimpleEmbeddedSchemaFromWsdlProvider versionProvider;
 
   /** Directory containing WSDL files. */
   @Parameter(defaultValue = "${project.basedir}/src/wsdl")
+  @Setter
   private File wsdlDirectory;
+
+  /** Optional groupId:artifactId reference to project dependency to look for WSDL resources. */
+  @Parameter @Setter private String wsdlDependency;
 
   /** Directory to output schema parsed from WSDL files. */
   @Parameter(defaultValue = "${project.basedir}/src/xsd")
+  @Setter
   private File sourceDestDir;
-
-  @Builder
-  private SchemaFromWsdlMojo(
-      List<String> wsdlFiles,
-      File wsdlDirectory,
-      File sourceDestDir,
-      SimpleEmbeddedSchemaFromWsdlProvider versionProvider) {
-    this.wsdlFiles = wsdlFiles;
-    this.wsdlDirectory = wsdlDirectory;
-    this.sourceDestDir = sourceDestDir;
-    this.versionProvider = versionProvider;
-  }
 
   /**
    * Execute the plugin.
@@ -83,11 +87,87 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
    */
   @Override
   public void execute() throws MojoExecutionException {
-    final List<URL> urlList = getWsdlUrlList();
-    for (URL url : urlList) {
-      String schema = versionProvider.getSchema(url);
-      writeSchemaToFile(url, schema);
+
+    List<URL> urlList;
+    if (wsdlDependency != null) {
+      urlList = getWsdlFromClasspathUrlList();
+    } else {
+      urlList = getWsdlFromDirectoryUrlList();
     }
+
+    if (urlList.isEmpty()) {
+      log.warn("No wsdl found.");
+    }
+
+    for (URL url : urlList) {
+      writeSchemaToFile(url, versionProvider.getSchema(url));
+    }
+  }
+
+  /**
+   * Get a list of URL for each specified WSDL from the specified dependency.
+   *
+   * @return List of URL.
+   * @throws MojoExecutionException Exception if unexpected condition occurs such as if no WSDLs
+   *     found.
+   */
+  private List<URL> getWsdlFromClasspathUrlList() throws MojoExecutionException {
+
+    if ((wsdlFiles == null) || wsdlFiles.isEmpty()) {
+      throw new MojoExecutionException(
+          "Must specify at least one wsdl file if WSDL dependency is specified.");
+    }
+
+    // Parse the referenced dependency to obtain groupId:artifactId.
+    final String[] wsdlDependencyArray = wsdlDependency.split(":");
+    if (wsdlDependencyArray.length != 2) {
+      throw new MojoExecutionException("WSDL dependency invalid: " + wsdlDependency);
+    }
+    final String groupId = wsdlDependencyArray[0];
+    final String artifactId = wsdlDependencyArray[1];
+
+    // Match the dependency from the project.  The resulting list should only be size of 1.
+    final List<String> cpList =
+        project
+            .getArtifacts()
+            .stream()
+            .filter(
+                a ->
+                    (groupId.equals(a.getGroupId())
+                        && artifactId.equals(a.getArtifactId())
+                        && null != a.getFile()))
+            .map(a -> a.getFile().getPath())
+            .collect(Collectors.toList());
+    if (cpList.size() != 1) {
+      throw new MojoExecutionException(
+          "Expected only 1 but found " + cpList.size() + " matching WSDL dependency.");
+    }
+
+    // Convert the path to URL.
+    URL url = null;
+    try {
+      url = new File(cpList.get(0)).toURI().toURL();
+    } catch (final MalformedURLException e) {
+      throw new MojoExecutionException("Error obtaining WSDL dependency classpath URL: ", e);
+    }
+
+    // Using the URL and classloader obtain URL of WSDL resources.
+    final List<URL> urlList = new ArrayList<>();
+    if (url != null) {
+      try (URLClassLoader loader = new URLClassLoader(new URL[] {url})) {
+        for (final String wsdlResource : wsdlFiles) {
+          final URL loadedResourceUrl = loader.getResource(wsdlResource);
+          if (loadedResourceUrl == null) {
+            throw new MojoExecutionException("Wsdl resource not found: " + wsdlResource);
+          }
+          urlList.add(loadedResourceUrl);
+        }
+      } catch (IOException e) {
+        throw new MojoExecutionException(e.getMessage());
+      }
+    }
+
+    return urlList;
   }
 
   /**
@@ -95,9 +175,9 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
    *
    * @return List of URL.
    * @throws MojoExecutionException Exception if unexpected condition occurs such as if no WSDLs
-   *     configured.
+   *     found.
    */
-  private List<URL> getWsdlUrlList() throws MojoExecutionException {
+  private List<URL> getWsdlFromDirectoryUrlList() throws MojoExecutionException {
     final List<URL> urlList = new ArrayList<>();
     if (wsdlFiles == null) {
       // If directory exists try to find wsdls there.
@@ -168,19 +248,14 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
    */
   private void writeSchemaToFile(final URL url, final String schema) throws MojoExecutionException {
     try {
-      Path path = Paths.get(url.toURI());
-      Path filePath = path.getFileName();
-      if (filePath == null) {
-        throw new MojoExecutionException("Unable to obtain path for: " + url.toString());
-      }
-      String fileName = filePath.toString();
-      int index = fileName.lastIndexOf('.');
+      String fileName = new File(url.getPath()).getName();
+      final int index = fileName.lastIndexOf('.');
       if (index > 0) {
         fileName = fileName.substring(0, index);
       }
       fileName += SCHEMA_FILE_EXTENSION;
-      File output = new File(sourceDestDir, fileName);
-      File parentDirectory = output.getParentFile();
+      final File output = new File(sourceDestDir, fileName);
+      final File parentDirectory = output.getParentFile();
       if (parentDirectory == null) {
         throw new MojoExecutionException(
             "Unable to obtain parent for: " + output.getAbsolutePath());
@@ -191,7 +266,7 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
       }
       log.info("Writing schema: {}", output.getAbsolutePath());
       Files.write(output.toPath(), schema.getBytes(StandardCharsets.UTF_8));
-    } catch (URISyntaxException | IOException | SecurityException e) {
+    } catch (IOException | SecurityException e) {
       throw new MojoExecutionException(e.getMessage());
     }
   }
