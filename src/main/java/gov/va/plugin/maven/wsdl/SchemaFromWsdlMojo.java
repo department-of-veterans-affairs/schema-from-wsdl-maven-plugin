@@ -39,6 +39,7 @@ import org.apache.maven.project.MavenProject;
  * Currently it does not support the whole suite of features for WSDL location although additional
  * features can be added as required.
  */
+@SuppressWarnings("StringSplitter")
 @NoArgsConstructor
 @Mojo(
     name = "schema-from-wsdl",
