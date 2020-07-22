@@ -38,12 +38,12 @@ import org.apache.maven.project.MavenProject;
  * not support the whole suite of features for WSDL location although additional features can be
  * added as required.
  */
+@SuppressWarnings({"UnescapedEntity", "StringSplitter"})
 @NoArgsConstructor
 @Mojo(
-  name = "schema-from-wsdl",
-  defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
-  requiresDependencyResolution = ResolutionScope.RUNTIME
-)
+    name = "schema-from-wsdl",
+    defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
+    requiresDependencyResolution = ResolutionScope.RUNTIME)
 @Slf4j
 public class SchemaFromWsdlMojo extends AbstractMojo {
 
@@ -128,9 +128,7 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
 
     // Match the dependency from the project.  The resulting list should only be size of 1.
     final List<String> cpList =
-        project
-            .getArtifacts()
-            .stream()
+        project.getArtifacts().stream()
             .filter(
                 a ->
                     (groupId.equals(a.getGroupId())
