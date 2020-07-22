@@ -28,18 +28,17 @@ import org.apache.maven.project.MavenProject;
 /**
  * Maven Mojo that writes an embedded schema found in a WSDL to a file.
  *
- * <p>&lt;p&gt;Schema files will have the same name as the associated WSDL but with extension
- * &lt;code&gt;.xsd &lt;/code&gt;.
+ * <p>Schema files will have the same name as the associated WSDL but with extension <code>.xsd
+ * </code>.
  *
- * <p>&lt;p&gt;The parameter configuration portion of this Mojo is heavily based on
- * jaxws-maven-plugin.
+ * <p>The parameter configuration portion of this Mojo is heavily based on jaxws-maven-plugin.
  *
- * <p>&lt;p&gt;However, the configuration for this Mojo has been implemented to meet the bare
- * requirements for the current use case and is much more simplistic than jaxws-maven-plugin.
- * Currently it does not support the whole suite of features for WSDL location although additional
- * features can be added as required.
+ * <p>However, the configuration for this Mojo has been implemented to meet the bare requirements
+ * for the current use case and is much more simplistic than jaxws-maven-plugin. Currently it does
+ * not support the whole suite of features for WSDL location although additional features can be
+ * added as required.
  */
-@SuppressWarnings("StringSplitter")
+@SuppressWarnings({"UnescapedEntity", "StringSplitter"})
 @NoArgsConstructor
 @Mojo(
     name = "schema-from-wsdl",
@@ -60,8 +59,8 @@ public class SchemaFromWsdlMojo extends AbstractMojo {
   private MavenProject project;
 
   /**
-   * List of files to use for WSDLs. If not specified, all &lt;code&gt;.wsdl&lt;/code&gt; files in
-   * the &lt;code&gt; wsdlDirectory&lt;/code&gt; will be used.
+   * List of files to use for WSDLs. If not specified, all <code>.wsdl</code> files in the <code>
+   * wsdlDirectory</code> will be used.
    */
   @Parameter @Setter private List<String> wsdlFiles;
 
