@@ -23,12 +23,12 @@
   <properties>
     <git.allowedBranchNames><![CDATA[^(dependabot/.*|master|release/.*|PR-[0-9]+|(.*/)?[A-Z]{2,10}-[0-9]+-.*)$]]></git.allowedBranchNames>
     <jacoco.coverage>0.88</jacoco.coverage>
-    <maven-core.version>3.6.0</maven-core.version>
-    <maven-plugin-annotations.version>3.5</maven-plugin-annotations.version>
-    <maven-plugin-api.version>3.6.0</maven-plugin-api.version>
+    <maven-core.version>3.6.3</maven-core.version>
+    <maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
+    <maven-plugin-api.version>3.6.3</maven-plugin-api.version>
     <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
-    <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-    <maven-site-plugin.version>3.8.2</maven-site-plugin.version>
+    <maven-project-info-reports-plugin.version>3.1.0</maven-project-info-reports-plugin.version>
+    <maven-site-plugin.version>3.9.1</maven-site-plugin.version>
   </properties>
   <dependencies>
     <dependency>
